@@ -14,7 +14,7 @@ const app = express()
 await connectDB()
 
 // Middleware
-app.use(cors({origin: "https://brezzy-drive-car-rental-jftz.vercel.app/", credentials: true}));
+app.use(cors({origin: "https://brezzy-drive-car-rental-jftz.vercel.app", credentials: true}));
 app.use(express.json());
 
 app.get('/', (req, res)=> res.send("Server is running"))
