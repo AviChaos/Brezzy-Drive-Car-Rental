@@ -14,7 +14,7 @@ const app = express()
 await connectDB()
 
 // Middleware
-app.use(cors());
+app.use(cors({origin: "https://brezzy-drive-car-rental-jftz.vercel.app/", credentials: true}));
 app.use(express.json());
 
 app.get('/', (req, res)=> res.send("Server is running"))
@@ -23,4 +23,4 @@ app.use('/api/owner', ownerRouter)
 app.use('/api/bookings', bookingRouter)
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, ()=> console.log(`Server running on port ${PORT}`))
+app.listen(PORT, ()=> {console.log(`Server running on port ${PORT}`)})
