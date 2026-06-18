@@ -1,0 +1,452 @@
+import React, { useEffect, useState } from 'react'
+import { assets } from '../assets/assets'
+import Title from '../components/Title'
+import { useAppContext } from '../context/AppContext'
+import toast from 'react-hot-toast'
+import { motion } from 'motion/react'
+
+const MyBookings = () => {
+
+  const { axios, user, currency } = useAppContext()
+
+  const [bookings, setBookings] = useState([])
+
+  // Fetch User Bookings
+
+  const fetchMyBookings = async () => {
+
+    try {
+
+      const { data } = await axios.get('/api/bookings/user')
+
+      if (data.success) {
+
+        setBookings(data.bookings)
+
+      }
+
+      else {
+
+        toast.error(data.message)
+
+      }
+
+    }
+
+    catch (error) {
+
+      toast.error(error.message)
+
+    }
+
+  }
+
+  // Payment Function
+
+  const payBooking = async (bookingId) => {
+
+    try {
+
+      const { data } = await axios.post(
+
+        '/api/bookings/complete-payment',
+
+        { bookingId }
+
+      )
+
+      if (data.success) {
+
+        toast.success(data.message)
+
+        fetchMyBookings()
+
+      }
+
+      else {
+
+        toast.error(data.message)
+
+      }
+
+    }
+
+    catch (error) {
+
+      toast.error(error.message)
+
+    }
+
+  }
+
+  const downloadInvoice = (bookingId)=>{window.open(`${axios.defaults.baseURL}/api/bookings/invoice/${bookingId}`, '_blank' )}
+
+  useEffect(() => {
+
+    if (user) {
+
+      fetchMyBookings()
+
+    }
+
+  }, [user])
+
+  return (
+
+    <motion.div
+
+      initial={{ opacity: 0, y: 30 }}
+
+      animate={{ opacity: 1, y: 0 }}
+
+      transition={{ duration: 0.6 }}
+
+      className='px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-16 text-sm max-w-7xl'
+
+    >
+
+      <Title
+
+        title='My Bookings'
+
+        subTitle='View and manage your all car bookings'
+
+        align='left'
+
+      />
+
+      <div>
+
+        {
+
+          bookings.map((booking, index) => (
+
+            <motion.div
+
+              key={booking._id}
+
+              initial={{ opacity: 0, y: 20 }}
+
+              animate={{ opacity: 1, y: 0 }}
+
+              transition={{
+
+                delay: index * 0.1,
+
+                duration: 0.4
+
+              }}
+
+              className='grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border border-borderColor rounded-lg mt-5 first:mt-12'
+
+            >
+
+              {/* Car */}
+
+              <div className='md:col-span-1'>
+
+                <div className='rounded-md overflow-hidden mb-3'>
+
+                  <img
+
+                    src={booking.car.image}
+
+                    alt=""
+
+                    className='w-full h-auto aspect-video object-cover'
+
+                  />
+
+                </div>
+
+                <p className='text-lg font-medium mt-2'>
+
+                  {booking.car.brand} {booking.car.model}
+
+                </p>
+
+                <p className='text-gray-500'>
+
+                  {booking.car.year}
+
+                  {' • '}
+
+                  {booking.car.category}
+
+                  {' • '}
+
+                  {booking.car.location}
+
+                </p>
+
+              </div>
+
+              {/* Booking Info */}
+
+              <div className='md:col-span-2'>
+
+                <div className='flex items-center gap-2'>
+
+                  <p className='px-3 py-1.5 bg-light rounded'>
+
+                    Booking #{index + 1}
+
+                  </p>
+
+                  <p
+
+                    className={`px-3 py-1 text-xs rounded-full
+
+                    ${booking.status === 'confirmed'
+
+                    ? 'bg-green-400/15 text-green-600'
+
+                    : 'bg-red-400/15 text-red-600'
+
+                    }`}
+
+                  >
+
+                    {booking.status}
+
+                  </p>
+
+                </div>
+
+                {/* Rental Period */}
+
+                <div className='flex items-start gap-2 mt-3'>
+
+                  <img
+
+                    src={assets.calendar_icon_colored}
+
+                    alt=""
+
+                    className='w-4 h-4 mt-1'
+
+                  />
+
+                  <div>
+
+                    <p className='text-gray-500'>
+
+                      Rental Period
+
+                    </p>
+
+                    <p>
+
+                      {booking.pickupDate.split('T')[0]}
+
+                      {' To '}
+
+                      {booking.returnDate.split('T')[0]}
+
+                    </p>
+
+                  </div>
+
+                </div>
+
+                {/* Location */}
+
+                <div className='flex items-start gap-2 mt-3'>
+
+                  <img
+
+                    src={assets.location_icon_colored}
+
+                    alt=""
+
+                    className='w-4 h-4 mt-1'
+
+                  />
+
+                  <div>
+
+                    <p className='text-gray-500'>
+
+                      Pick-up Location
+
+                    </p>
+
+                    <p>
+
+                      {booking.car.location}
+
+                    </p>
+
+                  </div>
+
+                </div>
+                    <div className='mt-5'>
+
+<p className='font-semibold mb-3'>
+
+Booking Progress
+
+</p>
+
+<div className='flex flex-col gap-2 text-sm'>
+
+<div>
+
+{booking.status === 'pending'
+
+? '⏳ Awaiting Approval'
+
+: '✅ Booking Approved'}
+
+</div>
+
+<div>
+
+{booking.returnStatus === 'ongoing'
+
+? '🚗 Car In Use'
+
+: '✅ Car Returned'}
+
+</div>
+
+<div>
+
+{booking.paymentStatus === 'locked'
+
+&& '🔒 Payment Locked'}
+
+{booking.paymentStatus === 'pending'
+
+&& '💳 Payment Ready'}
+
+{booking.paymentStatus === 'paid'
+
+&& '✅ Payment Complete'}
+
+</div>
+
+<div>
+
+{booking.invoiceNumber
+
+? '📄 Invoice Ready'
+
+: '📄 Invoice Pending'}
+
+</div>
+
+</div>
+
+</div>
+                {/* Payment */}
+
+                <div className='mt-4'>
+
+                  <p className='text-gray-500'>
+
+                    Payment Status
+
+                  </p>
+
+                  <p className='font-medium'>
+
+                    {booking.paymentStatus || 'locked'}
+
+                  </p>
+
+                </div>
+
+              </div>
+
+              {/* Price */}
+
+              <div className='md:col-span-1 flex flex-col justify-between gap-6'>
+
+                <div className='text-sm text-gray-500 text-right'>
+
+                  <p>
+
+                    Total Price
+
+                  </p>
+
+                  <h1 className='text-2xl font-semibold text-primary'>
+
+                    {currency}
+
+                    {booking.price}
+
+                  </h1>
+
+                  <p>
+
+                    Booked on
+
+                    {' '}
+
+                    {booking.createdAt.split('T')[0]}
+
+                  </p>
+
+                  <div className='mt-4'>
+
+{
+booking.paymentStatus === 'locked'
+&&
+(
+<button
+disabled
+className='w-full bg-gray-400 text-white py-2 rounded-lg cursor-not-allowed'
+>
+Payment Locked
+</button>
+)
+}
+
+{
+booking.paymentStatus === 'pending'
+&&
+(
+<button
+onClick={()=>payBooking(booking._id)}
+className='w-full bg-green-600 text-white py-2 rounded-lg'
+>
+Pay Now
+</button>
+)
+}
+
+{
+booking.paymentStatus === 'paid'
+&&
+(
+<button
+onClick={()=>downloadInvoice(booking._id)}
+className='w-full bg-blue-600 text-white py-2 rounded-lg'
+>
+Download Invoice
+</button>
+)
+}
+
+</div>
+                </div>
+
+              </div>
+
+            </motion.div>
+
+          ))
+
+        }
+
+      </div>
+
+    </motion.div>
+
+  )
+
+}
+
+export default MyBookings
