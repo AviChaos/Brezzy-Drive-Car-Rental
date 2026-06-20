@@ -16,12 +16,48 @@ const Login = () => {
             event.preventDefault();
             const {data} = await axios.post(`/api/user/${state}`, {name, email, password})
 
-            if (data.success) {
-                navigate('/')
-                setToken(data.token)
-                localStorage.setItem('token', data.token)
-                setShowLogin(false)
-            }else{
+            if(data.success){
+
+setToken(data.token)
+
+localStorage.setItem(
+
+'token',
+
+data.token
+
+)
+
+setShowLogin(false)
+
+toast.success(
+
+state==='register'
+
+? 'Account created successfully'
+
+: 'Login successful'
+
+)
+
+if(state==='register'){
+
+setState('login')
+
+setName('')
+
+setEmail('')
+
+setPassword('')
+
+return
+
+}
+
+navigate('/')
+
+}
+            else{
                 toast.error(data.message)
             }
 
