@@ -14,6 +14,34 @@ pass:process.env.EMAIL_PASS
 
 })
 
+transporter.verify(
+
+(error)=>{
+
+ if(error){
+
+ console.log(
+
+ 'Mailer Error:',
+
+ error
+
+ )
+
+ }
+
+ else{
+
+ console.log(
+
+ 'Mailer Ready'
+
+ )
+
+ }
+
+})
+
 export const sendWelcomeEmail = async(
 
 name,

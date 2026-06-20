@@ -4,6 +4,7 @@ import {toast} from 'react-hot-toast'
 import { useNavigate } from "react-router-dom";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL
+axios.defaults.timeout = 15000
 
 export const AppContext = createContext();
 
@@ -59,18 +60,30 @@ export const AppProvider = ({ children })=>{
 
     // useEffect to retrieve the token from localStorage
     useEffect(()=>{
-        const token = localStorage.getItem('token')
-        setToken(token)
-        fetchCars()
-    },[])
 
-    // useEffect to fetch user data when token is available
-    useEffect(()=>{
-        if(token){
-            axios.defaults.headers.common['Authorization'] = `${token}`
-            fetchUser()
-        }
-    },[token])
+const initializeApp = async()=>{
+
+const storedToken = localStorage.getItem('token')
+
+if(storedToken){
+
+setToken(storedToken)
+
+axios.defaults.headers.common[
+'Authorization'
+]=storedToken
+
+await fetchUser()
+
+}
+
+await fetchCars()
+
+}
+
+initializeApp()
+
+},[])
 
     const value = {
         navigate, currency, axios, user, setUser,
