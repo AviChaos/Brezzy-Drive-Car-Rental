@@ -18,12 +18,10 @@ await connectDB()
 
 // Middleware
 const allowedOrigins=[ 'https://brezzy-drive-car-rental-jftz.vercel.app', 'http://localhost:5173' ]
-app.use(
-    cors({
-        origin:allowedOrigins,
-        credentials:true
-    })
-)
+app.use(cors({
+origin:true,
+credentials:true
+}));
 
 app.use(express.json());
 
