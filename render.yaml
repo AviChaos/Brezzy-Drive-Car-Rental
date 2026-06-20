@@ -1,0 +1,11 @@
+services:
+
+- type: web
+
+  name: brezzy-drive
+
+  runtime: node
+
+  buildCommand: npm run build
+
+  startCommand: npm run start
