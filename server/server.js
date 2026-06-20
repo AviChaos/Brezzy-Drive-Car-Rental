@@ -13,7 +13,6 @@ await connectDB();
 
 const allowedOrigins = [
   "https://brezzy-drive-car-rental-jftz.vercel.app",
-  "http://localhost:5173",
 ];
 
 app.use(
